@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const app = express();
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(express.static("public"));
 
 var items = ["Buy Cat Food", "Cook the Cat Food", "Serve my Cat the Cat Food"];
 
