@@ -280,6 +280,21 @@ app.post("/", function(req, res){
     <% } %>
    </ul>
    ```
-This is how we can pass data from the server to our template, populating it with dynamic content. 
+This is how we can pass data from the server to our template, populating it with dynamic content.  
+
+### Adding Static Files
+Now remember how to add images/css/js static files to our project from my Express notes?  
+Firstly, if we add a **stylesheet link** (like Bootstrap's) it will work and load on our page because those files reside in a **remote location** (their server) but if we have a file like styles.css in our **working directory** (which means it's **local** to our working directory || a **statis page** in our local file system that we are trying to pull up) it will not load up, because Express does not automatically serve up all of the files in our working directory (root route). Express only serves the 'main access point' which is defined in the json file as 'app.js' and it also serves up the 'views' folder but everything else gets ignored. And we are linking the styles.css from our root route `css/styles.css`, expecting it to go to `localhost:3000/css/styles.css` which is expected to work for a **static website**, which we no longer operate. *All of our files need to be served up by our server itself. We can no longer use a href based link to serve up static files because we are using a  server based website.*    
+To fix this issue we need to **tell Express specifically to server up x and y static files** with their location.  
+We can do this with Express' function `static`: 
+```js
+app.use(express.static("public"));
+```
+Where 'public' is a folder inside of our working directory where all of our static files reside. With this in mind, **we do not need to add 'public' in front of our pathings** as it is already relative to every static file inside the public folder already, basically meaning that we are inside the public folder already **(?)**:    
+so instead of:  
+`public/css/styles.css`  
+it should just be:  
+`css/styles.css`
+
 
 
