@@ -1,3 +1,10 @@
+## Table of contents
+
+- [Creating EJS Template](#Creating-Our-First-EJS-Template-and-why-we-need-them)
+  - [Running Code](#Running-Code-Inside-the-EJS-Template)
+  - [Passing Data](#Passing-Data-from-Your-Webpage-to-Your-Server)
+  - [Links](#links)
+- [Adding Static Files](#Adding-Static-Files)
 ### Creating Our First EJS Template and why we need them
 In express.js with app.get we can do tons of calculations on our server side and send the response back to the user with res.send(); so it takes a lot less processing power from the client side.
  - Let's write, for example, a fast program that processes which day of the week it is from the user's machine automatic input, which will get proccessed in our server and will send back the result to the user with either "it's a weekend" or "it's a weekday" depending on the day.
