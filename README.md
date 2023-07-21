@@ -303,5 +303,139 @@ so instead of:
 it should just be:  
 `css/styles.css`
 
+# Templating vs Layouts
+- For this exercise we will make a new To Do list page called 'work'
+    - We will change the '`kindOfDay`' template name to '`listTitle`' because we want it to display a different list names depending on which To Do list page we're landing on, so the name sounds more *intuitive*. (If the user tries to access the home route ("/") then `listTitle` will display as the *current date* but if they access the work page we can make `listTitle` display a *dynamic* piece of data that we can decide for that page.) :
+    ```js
+    app.get("/work", function(req,res){
+    res.render("list", {listTitle: "Work List", newListItems: workItems});
+    });
+    //listTitle will display "Work List"  when user makes GET request to /work route
 
+    app.post("/work", function(req, res){
+        var item = req.body.newItem;
+
+        workItems.push(item);
+        //we push new submitted item to workItems array
+        
+        res.redirect("/work");
+        //redirect to app.get("/work") which renders list.ejs with work  templatings
+    });
+    ```
+- *Now, the issue with this code is that when we submit a new item to our list on the work page it will get added to the root route page's list and redirect us to the root route page.* Why is that? :  
+     ```html
+      <form class="item" action="/" method="POST">
+          <input type="text" name="newItem" placeholder="New Item" autocomplete="off">  
+          <button type="submit" name="button">+</button>
+         </form>
+In this form when we press the Submit button it redirects us to the root route which then goes into the `app.post("/")` (home route) which tells the code to add the newly submitted item in the `items` array (which belongs to the root route's To Do list) and redirects us to the home route. 
+
+- If we give the **button a dynamic value** which changes depending on which **route** we accessed the form from then we can use that value later on for an if statement which will decide if  the **submitted item** goes in the `items` or `workItems` array depending on which route the user finds themselves submitting from:  
+*html*
+```html
+<body>
+    <div class="box" id="heading">
+       <h1> <%= listTitle %> </h1>
+    </div>
+
+    <div class="box">
+         <% for (let i = 0; i < newListItems.length; i++) { %>
+            <div class="item">
+                <input type="checkbox">
+                 <p><%= newListItems[i] %></p>
+            </div>
+         <% } %>
+
+         <form class="item" action="/" method="POST">
+          <input type="text" name="newItem" placeholder="New Item" autocomplete="off">  
+          <button type="submit" name="list" value=<%= listTitle %>>+</button>
+         </form>
+    </div>
+
+</body>
+```
+ - Now if user finds themselves in the work page's path then the button's value will be "Work" because we specified in the `app.get("/work")` we render the template `listTitle` to equal to "Work List" (it only takes first word, "Work")
+ - We take that value "**Work**" and make an if statement inside of the `app.post("/"
+ )` that if the button's value is === "Work" then we will 
+    - push newly added item to `workItems` array 
+    - redirect user to `app.get("/work")`
+- Else if form's button value is equal to **anything else** then push newly submitted item to `items` array and redirect to `app.get("/")` :
+```js
+app.post("/", function(req, res){
+
+    var item = req.body.newItem;
+    
+    if(req.body.list === "Work"){       //<---
+        workItems.push(item);
+        res.redirect("/work");
+    } else{
+            items.push(item);
+            res.redirect("/");
+    }
+});
+```
+This is one example of how useful templating can be.
+### Layouts
+What if we have **multiple pages** where the only thing that changes is their **content** but the styling, boilet plates and footers, for example, remain the same?  
+We can save those **repetitive pieces of codes** in ejs files (called Layouts or Partials) within our views folder. Let's say we saved the 
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css\styles.css">
+    <title>To Do List</title>
+</head>
+<body>
+```
+in a file called *header.ejs* and  
+```html
+</body>
+<footer>
+    <p>Coded with love by <a href="https://github.com/anasolomon" target="_blank">Ana-Maria Tanasciuc </a> @<a href="https://github.com/angelabauer" target="_blank">Angela Yu</a></p>
+</footer>
+</html>
+```
+in a file called *footer.ejs*, both of these files in the views folder.  
+If we make a new page, we can simply integrate these two Layouts as our boiler plate, our page now should look like :
+```html
+<%- include('header'); -%>
+    <div class="box" id="heading">
+       <h1> <%= listTitle %> </h1>
+    </div>
+
+    <div class="box">
+         <% for (let i = 0; i < newListItems.length; i++) { %>
+            <div class="item">
+                <input type="checkbox">
+                 <p><%= newListItems[i] %></p>
+            </div>
+         <% } %>
+
+         <form class="item" action="/" method="POST">
+          <input type="text" name="newItem" placeholder="New Item" autocomplete="off">  
+          <button type="submit" name="list" value=<%= listTitle %>>+</button>
+         </form>
+    </div>
+
+    <%- include('footer'); -%>
+```
+Where we include those two files in the place of that repetitive code.  
+So if we try to make a completely new ejs page, giving it a app.get route and render it with EJS, the boilet plate will look completely the same.  
+*html*
+```html
+<%- include('header'); -%>
+<h3>This is my about page</h3>
+
+<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Mollitia expedita, impedit at ipsa placeat et laudantium. Libero reiciendis ullam repellendus voluptatibus enim, error deleniti? Facilis laboriosam quisquam quis assumenda aspernatur!</p>
+
+<%- include('footer'); -%>
+```
+*JS*
+```js
+app.get("/about", function(req,res){
+    res.render("about");
+});
+```
 
